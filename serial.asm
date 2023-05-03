@@ -84,7 +84,7 @@ uartdivisorlsb          equ     word ptr 03f8h
 uartdivisormsb          equ     word ptr 03f9h
 
 
-        include \usr\include\gen.mac
+;        include \usr\include\gen.mac
 
 ;
 ; This is to get around an "anomaly" with the National Semiconductor
