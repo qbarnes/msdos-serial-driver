@@ -247,6 +247,7 @@ serialsetup:    push    dx
                 mov     cl,4                    ;bits to move offset number
                 shr     al,cl                   ;move offset number to lsb
                 mov     ah,0                    ;zero hi byte of offset
+                and     al, 0feh                ;mask out bit 0 (parity)
                 add     ax,offset baudtable     ;add base of table to offset
                 mov     bx,ax                   ;put effective addr in ptr
                 mov     ax,[bx]                 ;now have 16 bit divisor value
