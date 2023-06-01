@@ -326,7 +326,8 @@ noxon:          inc     readpointer             ; move to next read loc
 readexit:       or      ah,ah                   ;clear zero flag if set
                 pop     bx                      ;restore index reg used
 nocharread:     pop     ds
-                iret                            ;return to the caller
+                ret     0002                    ;return to the caller perserving
+                                                ;flags (so don't use iret)
 ;
 resetpointers:  mov     readpointer,offset serialbuffer    ;wrap buffer pointer
                 jmp     readexit
