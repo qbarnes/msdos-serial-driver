@@ -395,6 +395,8 @@ nohead:
                 mov     toread,offset tohostbuf ; wrap pointer back to start
 
 sendtoa:
+                cmp     al, xoff
+                je      turnoff
                 cmp     tocount,0               ; is queue empty now?
                 jg      sendtoit                ; just go send the char
 
@@ -405,7 +407,7 @@ sendtoa:
 ; loops around (blah!) waiting for it to empty before changing the IER.
 ; Interrupts are enabied during this time. Known to be in WD8250.
 ;
-                push    ax                      ; SOK (Start of Kludge)
+turnoff:        push    ax                      ; SOK (Start of Kludge)
                 pushf                           ; Wait for shift reg empty
                 sti
                 mov     dx,uartlinestatus
