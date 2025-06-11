@@ -4,15 +4,15 @@
 ;************************************************************************
 ;*                                                                      *
 ;* SERIAL - Installable serial i/o subsystem. Interrupt driven input    *
-;*              to an internat 2K byte buffer, with characters being    *
-;*              remaved from it on a function call basis. Character     *
+;*              to an internal 2K byte buffer, with characters being    *
+;*              removed from it on a function call basis. Character     *
 ;*              output is initiated if the channel is clear, else the   *
 ;*              output driver waits for completion of the last char     *
 ;*              before transmitting the current one and exiting.        *
 ;*              The input buffer is a circular buffer, so the last      *
 ;*              2K characters are always to be found in it.             *
 ;*                                                                      *
-;*      SERIAL is intended to replace the nermal polled interface       *
+;*      SERIAL is intended to replace the normal polled interface       *
 ;*      to the serial channel to allow programs better throughput       *
 ;*      characteristics.                                                *
 ;*                                                                      *
@@ -20,7 +20,7 @@
 ;*                      -initilized to 9600 baud, no parity, 8 bits, 1 stop
 ;*                      -added fouth function call to get current length
 ;*  modified by L. Sherman
-;*  Modified by F. Pellett, 05/08/87. (It still needs more work.)
+;*  Modified by F. Pellett, 05/08/87.  (It still needs more work.)
 ;*
 ;*  set xbuflen to desired buffer length (2048) and
 ;*  xbufmax and xbufmin to values when to send xoff and xon (if xoff sent)
@@ -29,15 +29,15 @@
 ;
 ; When an interrupt reaches the PIC, it issues an interrupt to the processor,
 ; returning vector 30H in response to the active interrupt on line 4 of
-; the PIC. At this point, CS:IP will be loaded from [0000:0030]. We will
+; the PIC.  At this point, CS:IP will be loaded from [0000:0030]. We will
 ; supply a new vector to our receive service routine at this address.
 ;
 ; When int 14 is executed, CS:IP will be loaded from [0000:0050]. We will
 ; have taken the vector that was in that position, and stored it into
-; SYSTEMVECTOR, replacing the old vector with one of our own. To get back to
+; SYSTEMVECTOR, replacing the old vector with one of our own.  To get back to
 ; the normal dos code, we would have to do a far indirect jump to SYSTEMVECTOR.
 ;
-; However, I find-that whenever the DOS is called to service the port,
+; However, I find that whenever the DOS is called to service the port,
 ; the interrupt line of the USART becomes disabled as a result of the
 ; way the service routine is handled.... The result is that the entirety
 ; of the functions of INT 14 have to be assumed by the SERIAL system, with
@@ -45,7 +45,7 @@
 ;
 ; Once the SERIAL handler is installed, very simple programs can be built
 ; which use the serial port without need for exotic programming techniques
-; to ensure servicing the serial port tn a fast polling environment.
+; to ensure servicing the serial port in a fast polling environment.
 ;
 ;************************************************************************
 ;*                                                                      *
@@ -70,7 +70,7 @@ xon                     equ     011h            ; XON control character
 xoff                    equ     013h            ; XOFF control character
 ;
 ; the following equates apply to the 8250 serial communications device
-; which is a hardware specific feature of the 1BM and most compatibles.
+; which is a hardware specific feature of the IBM and most compatibles.
 ;
 uart                    equ     word ptr 03f8h
 uartdata                equ     word ptr 03f8h
@@ -84,7 +84,7 @@ uartdivisorlsb          equ     word ptr 03f8h
 uartdivisormsb          equ     word ptr 03f9h
 
 
-;        include \usr\include\gen.mac
+;                include \usr\include\gen.mac
 
 ;
 ; This is to get around an "anomaly" with the National Semiconductor
@@ -132,27 +132,27 @@ serial_TEXT        ENDS
 ;_BSS               ENDS
 ;_DATA              SEGMENT WORD PUBLIC 'DATA'
 ;_DATA              ENDS
-;DGROUP             GROUP    CONST,_BSS,_DATA
+;DGROUP             GROUP       CONST,_BSS,_DATA
 
-;ASSUME          CS: serial_TEXT, DS: DGROUP, SS: DGROUP, ES: DGROUP
+;ASSUME             CS: serial_TEXT, DS: DGROUP, SS: DGROUP, ES: DGROUP
 
 serial_data     segment
 serial_data     ends
 
-assume          cs:serial_TEXT, ds:serial_data, ss:serial_data, es:serial_data
+assume       cs:serial_TEXT, ds:serial_data, ss:serial_data, es:serial_data
 
-PUBLIC             _serial
+PUBLIC          _serial
 
-;**************************************************************
-;
+;***********************************************************
 
 
 serial_text     segment
-;                assume cs:serial_text
-;                assume cs:serial_text
-;                org     0100h
 
-;                public _serial
+;                assume cs:serial_text
+;                assume cs:serial_text
+;                org    0100h
+
+;                public  _serial
 
 _serial         proc    far
                 push    bp
@@ -168,20 +168,20 @@ _serial         proc    far
 
 ;
 ; This code module will intercept all int 14 functions:
-;       1. the status function will return a char ready if the buffer
-;              is not empty.
-;       2. the read function will check the buffer for a character, and
-;              if one is not present, will return a zero to the application
-;              and WILL HAVE THE ZERO FLAG SET ON NO CHARACTER AVAILABLE.
-;              This makes possible polled applications without devious
-;              coding.
+;       1.  the status function will return a char ready if the buffer
+;               is not empty.
+;       2.  the read function will check the buffer for a character, and
+;               if one is not present, will return a zero to the application
+;               and WILL HAVE THE ZERO FLAG SET ON NO CHARACTER AVAILABLE.
+;               This makes possible polled applications without devious
+;               coding.
 ;
                 jmp     serialinit              ;to jump to setup code
 ;
-; When we reach this point, we are being calted by an application as if
+; When we reach this point, we are being called by an application as if
 ; we were int 14.. we must accept its inputs, and return its return values.
 ;
-door            label word                      ;this is the new int 14 entry
+door            label   word                    ;this is the new int 14 entry
 
                 push    ds                      ;gotta save DS cause we use it
                 push    ax
@@ -238,7 +238,7 @@ serialsetup:    push    dx
 
         cli                                     ;disallow interrupts
 
-                mov     dx, uartlinecontrol     ;allow setting of baud rate
+                mov     dx,uartlinecontrol      ;allow setting of baud rate
                 and     al,01fh                 ;mask inactive bits
                 or      al,80h                  ;and set DLAB bit.
                 out     dx,al                   ;set up to write divisor
@@ -295,13 +295,13 @@ serialread:     cmp     buffercount,0           ;see if a character is ready
                 or      al,al                   ;set the zero flag
                 jmp     nocharread              ;to the application
 
-gotone:         push    bx
+gotone: push    bx
                 mov     ah,00000001b            ;dummy status byte
-                mov     bx,readpointer          ;poaint bx to the read data buf
+                mov     bx,readpointer          ;point bx to the read data buf
                 mov     al,[bx]                 ;fetch the character
 ;
                 dec     buffercount             ;another one bites the dust
-                cmp     hostxoff,0              ;check if xoff was sent atredy
+                cmp     hostxoff,0              ;check if xoff was sent alredy
                 je      noxon                   ; jmp if no xon to be sent
 ;                                                 because no previous xoff
 ; we get here when an xoff was sent before, and we might need to send
@@ -318,7 +318,7 @@ sendxon:
                 mov     hostxoff,0              ; clear hostxoff flag
                 pop     ax
 ;
-noxon:          inc     readpointer             ; move to next read loc
+noxon:    inc   readpointer             ; move to next read loc
                 cmp     readpointer,offset buffertop
                 jge     resetpointers
 ;
@@ -327,7 +327,7 @@ readexit:       or      ah,ah                   ;clear zero flag if set
 nocharread:     pop     ds
                 iret                            ;return to the caller
 ;
-resetpointers:  mov     readpointer,offset serialbuffer    ;wrap buffer pointer
+resetpointers:  mov     readpointer,offset serialbuffer ;wrap buffer pointer
                 jmp     readexit
 ;
 ; the port status routine
@@ -349,12 +349,12 @@ nosetbit:       pop     dx
                 pop     ds
                 iret
 
-;     Interrupt processing routine: we arrive here if we have one of
-;     two different interrupts: either RCA (Recieved character available)
-;     (input has arrived from the host) or THRE (Transmit Holding Register
-;     Empty)(it is ok to send data to the host now.)
+;       Interrupt processing routine: we arrive here if we have one of
+;       two different interrupts: either RCA (Recieved character available)
+;       (input has arrived from the host) or THRE (Transmit Holding Register
+;       Empty)(it is ok to send data to the host now.)
 
-serialinput     label word
+serialinput     label   word
 
                 push    ax
                 push    dx
@@ -366,17 +366,17 @@ serialinput     label word
                 mov     ax,seg serial_data
                 mov     ds,ax
 
-                mov     dx,uartintident         ; find out which interrupt tt is
+                mov     dx,uartintident         ; find out which interrupt it is
                 in      al,dx                   ; get Int. Ident. Reg. contents
 
 serialagain:
                 cmp     al, 100b                ; is it RCA interrupt?
-                jz      rcatrap                 ; jump if it ts
+                jz      rcatrap                 ; jump if it is
                 cmp     al, 10b                 ; is it THRE interrupt?
                 jz      sendtohost
                 jmp     sendclear
 ;
-;        Begin handling a THRE Interrupt here:
+;       Begin handling a THRE Interrupt here:
 sendtohost:
                 cmp     quehead, 0              ; Anything pending at head?
                 je      nohead
@@ -401,9 +401,9 @@ sendtoa:
 ;
 ; The following ten lines of code are gaggage to get around a "peculiarity"
 ; of the 8250 chip that when the IER is changed, the byte being shifted
-; out tn the transmitter shift register falls on the floor. So, this code
+; out in the transmitter shift register falls on the floor.  So, this code
 ; loops around (blah!) waiting for it to empty before changing the IER.
-; Interrupts are enabied during this time. Known to be in WD8250.
+; Interrupts are enabled during this time. Known to be in WD8250.
 ;
                 push    ax                      ; SOK (Start of Kludge)
                 pushf                           ; Wait for shift reg empty
@@ -414,11 +414,11 @@ gag1:
                 test    al, 01000000b
                 jz      gag1
                 popf
-                pop     ax                      ; EQK (End of Kiudge)
+                pop     ax                      ; EOK (End of Kludge)
 
                 push    ax                      ; save char to be sent
                 mov     al,1                    ; to disable THRE interrupt
-                mov     dx, uartintenable
+                mov     dx,uartintenable
                 out     dx,al
                 pop     ax
 
@@ -440,8 +440,8 @@ sendtoit:
 
 ;
 ;
-;        Otherwise, begin RCA (Received character available)
-;        interrupt handling:
+;       Otherwise, begin RCA (Received character available)
+;       interrupt handling:
 ;
 rcatrap:
                 mov     dx,uart                 ;point to the uart rec reg
@@ -450,8 +450,8 @@ rcatrap:
                 je      gotxoff                 ;if not, continue checking
                 cmp     al,xon                  ; is it an XON?
                 je      gotxon                  ;
-;                cmp     al,0ch                  ; is it a FF? %%%
-;                je      gotff
+;               cmp     al,0ch                  ; is it a FF? %%%
+;               je      gotff
                 jmp     regchar
 
 gotxoff:        mov     pcxoff,1
@@ -460,14 +460,14 @@ gotxoff:        mov     pcxoff,1
                 out     dx,al
                 jmp     serialinxit
 
-gotxon:         mov     pcxoff,0                ; no xoff pending anymore
+gotxon:  mov    pcxoff,0                ; no xoff pending anymore
                 cmp     quehead,0               ; see if xon/xoff waiting
                 jne     enablethre              ; if so, enable THRE
                 cmp     tocount,0               ; enable THRE only if there
                 je      serialinxit             ; is something to send
 
 enablethre:
-                SET_IER         3                  ; enable THRE and RCA
+                SET_IER         3               ; enable THRE and RCA
                 jmp     serialinxit
 
 gotff:          call    serialempty             ; dump the buffer from host
@@ -482,12 +482,12 @@ gotff:          call    serialempty             ; dump the buffer from host
 regchar:
 ;  Below 2 lines are insurance code: if everything else works ok,
 ;  we'll never encounter this situtation.  However, if they don't,
-;  then we would rather drop chars on the floor immedtately than to
+;  then we would rather drop chars on the floor immediately than to
 ;  cause a wrap-around in the circular queue and plot things twice.
-                cmp     buffercount,xbuflen     ; see jf queue completely full
+                cmp     buffercount,xbuflen     ; see if queue completely full
                 jge     serialinxit             ; if so, drop char on floor
 
-                mov     bx,writepointer         ;get the buffer write painter
+                mov     bx,writepointer         ;get the buffer write pointer
                 mov     [bx],al                 ;store the character
                 inc     writepointer            ;move to the next loc
 
@@ -497,7 +497,7 @@ regchar:
                 mov     writepointer,offset serialbuffer
 
 incbuffer:      inc     buffercount             ; and increment the char count
-                cmp     buffercount,xbufmax     ; send xoff tf nearty full
+                cmp     buffercount,xbufmax     ; send xoff if nearly full
                 jl      serialinxit             ; otherwise, exit
 
 ;  the buffer is nearly full (above cutoff point): send an xoff
@@ -507,7 +507,7 @@ incbuffer:      inc     buffercount             ; and increment the char count
                 mov     quehead, xoff           ; send an xoff to the host
                 mov     hostxoff,1              ; set hostxoff flag
                 SET_IER         3               ; enable RCA and THRE
-;                jmp     serialinxit            ; fall thru
+;               jmp     serialinxit             ; fall thru
 
 serialinxit:
 ; This condition (another pending interrupt at the same time) does occur
@@ -525,12 +525,12 @@ serialfinish:
                 pop     ds
                 pop     bx
                 pop     dx
-                pop     aX
+                pop     ax
                 iret
 
 sendclear:
 ;   We hope the code below is never used, because those interrupts
-;   aren't enabled (we think.) However, just in case we get one,
+;   aren't enabled (we think.)  However, just in case we get one,
 ;   we perform the following steps to clear that interrupt:
                 mov     dx,uartmodemstatus
                 in      al,dx                   ; reset modem status int
@@ -552,7 +552,7 @@ serialempty     PROC    near
                 ret
 serialempty     ENDP
 
-quetohost       PROC    near                    ; queue byte in al to the hest
+quetohost       PROC    near                    ; queue byte in al to the host
                 mov     bx,towrite              ; get pointer into to-host queue
                 mov     [bx],al                 ; store byte in host queue
                 inc     towrite
@@ -568,7 +568,7 @@ incto:          inc     tocount
                 jne     nostart                 ; then it was already enabled
 
                 SET_IER         3               ; enable THRE and RCA ints
-                out    dx,al                    ; Send the character
+                out     dx, al                  ; Send the character
 
 nostart:
                 ret
@@ -577,7 +577,7 @@ nostart:
 
 towait:
                 sti                             ; Make sure interrupts enabled
-                cmp     tocount,tolen           ; if queue to host ts full, THEN
+                cmp     tocount,tolen           ; if queue to host is full, THEN
                 je      towait                  ; we'll wait till it empties
 quedone:        ret
 
@@ -591,7 +591,7 @@ serial_text     ends
 ;*                                                                      *
 ;************************************************************************
 
-serial_data           segment
+serial_data             segment
 
 
                 even
@@ -604,46 +604,46 @@ baudtable       dw      417h            ;110 baud
                 dw      018h            ;4800
                 dw      00ch            ;9600
 
-setupword       label word
+setupword       label   word
                 dw      ?
-readpointer     label word
+readpointer     label   word
                 dw      ?
-writepointer    label word
+writepointer    label   word
                 dw      ?
-buffercount     label word
+buffercount     label   word
                 dw      ?
-toread          label word
+toread          label   word
                 dw      ?
-towrite         label word
+towrite         label   word
                 dw      ?
-tocount         label word
+tocount         label   word
                 dw      ?
-systemvector    label word
+systemvector    label   word
                 dd      ?
-comsavvector    label word
+comsavvector    label   word
                 dd      ?
 
 
                 even
-hostxoff        db      0             ; 1 if xoff has been sent to host
+hostxoff        db      0               ; 1 if xoff has been sent to host
 
                 even
-pcxoff          db      0             ; 1 if this pc has received an xoff
+pcxoff          db      0               ; 1 if this pc has received an xoff
 
                 even
-quehead         db      0             ; Non-zero means transmit this char first
+quehead         db      0               ; Non-zero means transmit this char first
 
                 even
-serialbuffer    label word
+serialbuffer    label   word
                 db      xbuflen dup (?)
-buffertop       label word
+buffertop       label   word
 
                 even
-tohostbuf       label word
+tohostbuf       label   word
                 db      tolen dup (?)
-tohosttop       label word
+tohosttop       label   word
 
-serial_data           ends
+serial_data             ends
 
 serial_text     segment
 
@@ -656,7 +656,7 @@ serial_text     segment
 ; SERIALINIT initializes the buffer pointers and counter, grabs the old
 ; int 14 vector from 0000:0030 and replaces it with the origin address
 ; of this program, and unmasks the uart interrupt line on the PIC.
-;
+
 serialinit:     call    serialempty
                 mov     toread,offset tohostbuf
                 mov     towrite,offset tohostbuf
@@ -665,6 +665,8 @@ serialinit:     call    serialempty
 ;
 ; get the old int 14 vector and steal it
 ;
+
+
                 push    es
                 mov     ax,0
                 mov     es,ax
@@ -674,6 +676,7 @@ serialinit:     call    serialempty
                 pop     es
                 mov     systemvector,ax         ; save original locations
                 mov     systemvector+2,bx
+
 ;
 ; install our entry address as the new int 14 vector
 ;
@@ -692,10 +695,10 @@ serialinit:     call    serialempty
                 push    es
                 mov     ax,0
                 mov     es,ax
-                mov     ax,es:commvector       ;this is the offset
-                mov     bx,es:commvector+2     ;this is the segment
+                mov     ax,es:commvector        ;this is the offset
+                mov     bx,es:commvector+2      ;this is the segment
                 pop     es
-                mov     comsavvector,ax        ; save original locations
+                mov     comsavvector,ax         ; save original locations
                 mov     comsavvector+2,bx
 
                 mov     ax,cs
@@ -707,6 +710,7 @@ serialinit:     call    serialempty
                 mov     es:commvector,bx        ;is the offset
                 mov     es:commvector+2,dx      ;is the code segment
                 pop     es
+
 ;
 ; empty the usart receive buffer
 ;
@@ -724,17 +728,17 @@ serialinit:     call    serialempty
                 out     dx,al
 ;
                 mov     dx,uartdivisorlsb
-                mov     al,0ch                 ;lo byte of 9600 baud
+                mov     al,0ch                  ;lo byte of 9600 baud
                 out     dx,al
 ;
                 mov     dx,uartdivisormsb
                 mov     al,0                    ;hi byte of 9600 baud
                 out     dx,al
 ;
-; Now set to 9600 baud... reset diab, and set up rest of usart
+; now set to 9600 baud... reset dlab, and set up rest of usart
 ;
-                mov     dx, uartlinecontrol
-                mov     al ,03h                  ;8 bit no parity 1 stop
+                mov     dx,uartlinecontrol
+                mov     al,03h                  ;8 bit no parity 1 stop
                 out     dx,al
 ;
                 mov     dx,uartmodemcontrol
@@ -769,7 +773,7 @@ serial_text     ends
 
 serial_text     segment
 
-                public _unserial
+                public  _unserial
 
 
 ; restore original int 14 vector
@@ -798,8 +802,8 @@ _unserial       proc    far
                 mov     es:int14vector+2,bx     ;this is the segment
                 mov     ax,comsavvector         ; restore original locations
                 mov     bx,comsavvector+2
-                mov     es:commvector,ax       ;this is the offset
-                mov     es:commvector+2,bx     ;this is the segment
+                mov     es:commvector,ax        ;this is the offset
+                mov     es:commvector+2,bx      ;this is the segment
 
         sti
 
