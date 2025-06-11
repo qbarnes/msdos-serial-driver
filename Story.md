@@ -1,5 +1,5 @@
 The code when it came to my company worked great on real IBM PCs
-and AT&T 6300 PCs, but had all sorts of intermittant problems
+and AT&T 6300 PCs, but had all sorts of intermittent problems
 when running on IBM clone PCs my company had bought to fulfill a
 contract.  They were dropping characters and sometimes wedging.
 
